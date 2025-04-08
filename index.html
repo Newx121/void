@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>void.lol</title>
+  
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&display=swap" rel="stylesheet">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ff1f4b'%3E%3Cpath d='M12 2C7 2 4 6 4 10c0 3 1.5 5 3 6v3c0 .6.4 1 1 1h2v-3h2v3h2c.6 0 1-.4 1-1v-3c1.5-1 3-3 3-6 0-4-3-8-8-8zM8 12c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.5 1-1 1zm8 0c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.5 1-1 1z'/%3E%3C/svg%3E">
+
+  <style>
+    /* === Base Styles === */
+    body, html {
+      margin: 0;
+      padding: 0;
+      background: #0a0a0a;
+      font-family: 'UnifrakturCook', cursive;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    /* === Loader === */
+    #loader {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      background: #0a0a0a;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
+    }
+    #loader.fade-out {
+      opacity: 0;
+      visibility: hidden;
+    }
+    #loader .skull {
+      width: 80px;
+      filter: drop-shadow(0 0 20px #ff1f4b88);
+      animation: pulse 2s infinite;
+    }
+    #loader .loading-text {
+      color: #ff1f4b;
+      margin-top: 20px;
+      font-size: 1.2rem;
+      text-shadow: 0 0 10px #ff1f4b88;
+    }
+
+    /* === Main Content === */
+    main {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-image: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
+    }
+    h1 {
+      font-size: 4rem;
+      margin-bottom: 30px;
+      color: #ff1f4b;
+      text-shadow: 0 0 10px #ff1f4b88;
+      min-height: 4.5rem;
+    }
+    .links {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    a {
+      text-decoration: none;
+      color: #f0f0f0;
+      background: #1a1a1a;
+      border: 2px solid #ff1f4b;
+      padding: 12px 30px;
+      border-radius: 8px;
+      font-size: 1.2rem;
+      transition: all 0.2s ease-in-out;
+      box-shadow: 0 0 10px #ff1f4b55;
+      animation: flicker 0.8s infinite steps(2);
+    }
+    a:hover {
+      background: #ff1f4b;
+      color: #0a0a0a;
+      box-shadow: 0 0 20px #ff1f4b;
+      transform: scale(1.05);
+    }
+    .skull-bg {
+      position: fixed;
+      bottom: 20px;
+      opacity: 0.05;
+      width: 150px;
+      height: auto;
+    }
+
+    /* === Cursor === */
+    #cursor-glow {
+      position: fixed;
+      width: 87px;
+      height: 87px;
+      background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      filter: blur(22px);
+      transition: opacity 0.2s ease;
+      mix-blend-mode: screen;
+      animation: cursor-pulse 3s infinite ease-in-out;
+    }
+
+    /* === Animations === */
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.8; }
+    }
+    @keyframes flicker {
+      0% { opacity: 0.8; }
+      50% { opacity: 1; }
+    }
+    @keyframes cursor-pulse {
+      0%, 100% { opacity: 0.7; transform: translate(-50%, -50%) scale(1); }
+      50% { opacity: 0.9; transform: translate(-50%, -50%) scale(1); }
+    }
+    @keyframes gentle-flicker {
+      0%, 100% { opacity: 1; box-shadow: 0 0 12px #ff1f4b77; }
+      20%, 60% { opacity: 0.88; box-shadow: 0 0 6px #ff1f4b33; }
+      40%, 80% { opacity: 0.94; box-shadow: 0 0 15px #ff1f4b99; }
+    }
+    @keyframes soft-flicker {
+      0%, 100% { opacity: 1; box-shadow: 0 0 10px #ff1f4b55; }
+      25% { opacity: 0.98; box-shadow: 0 0 8px #ff1f4b33; }
+      50% { opacity: 0.95; box-shadow: 0 0 12px #ff1f4b66; }
+      75% { opacity: 0.99; box-shadow: 0 0 9px #ff1f4b44; }
+    }
+
+/* Sound Toggle Button */
+#sound-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  background: #1a1a1a;
+  border: 2px solid #ff1f4b;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 10px #ff1f4b55;
+  transition: all 0.3s ease;
+  z-index: 9999;
+}
+
+#sound-toggle:hover {
+  background: #ff1f4b;
+  transform: scale(1.1);
+}
+
+#sound-toggle svg {
+  width: 60%;
+  height: 60%;
+  filter: drop-shadow(0 0 3px #ff1f4b88);
+}
+
+  </style>
+</head>
+
+<body>
+  
+<!-- Mute Button -->
+<button id="sound-toggle" aria-label="Toggle sound">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="#ff1f4b">
+    <path id="sound-icon" d="M14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77zm-3 2.06v13.42l-4-4H3v-6h4l4-4zm5.54 1.46L15 7.59l-1.54-1.54-1.41 1.41L13.59 9l-1.54 1.54 1.41 1.41L15 10.41l1.54 1.54 1.41-1.41L16.41 9l1.54-1.54-1.41-1.41z"/>
+  </svg>
+</button>
+
+  <!-- Cursor -->
+  <div id="cursor-glow"></div>
+
+  <!-- Loading Screen -->
+  <div id="loader">
+    <div class="loading-text">summoning the void...</div>
+  </div>
+
+  <!-- Background Audio -->
+  <audio id="ambient-audio" src="creepy.mp3" loop></audio>
+
+  <!-- Main Content -->
+  <main id="main-content">
+    <h1>void.lol</h1>
+    <div class="links">
+      <a href="https://www.youtube.com/@NevixToSzef" target="_blank" rel="noopener noreferrer">YouTube</a>
+      <a href="https://discordapp.com/users/1165622984204095488" target="_blank" rel="noopener noreferrer">Discord</a>
+      <a href="https://open.spotify.com/user/xh75omw7t7qtz2y28n27i8gii?si=ed651ec3725d456f" target="_blank" rel="noopener noreferrer">Spotify</a>
+    </div>
+    <img class="skull-bg" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Skull_icon.svg" alt="Skull">
+  </main>
+
+  <!-- Scripts -->
+  <script src="cursor.js"></script>
+  <script>
+
+// Audio Toggle Functionality
+const soundToggle = document.getElementById('sound-toggle');
+const audio = document.getElementById('ambient-audio');
+let isMuted = false;
+
+// Set initial state
+audio.volume = 0.4;
+
+soundToggle.addEventListener('click', () => {
+  isMuted = !isMuted;
+  
+  if (isMuted) {
+    audio.volume = 0;
+    document.getElementById('sound-icon').setAttribute('d', 'M16 5v14l-5-5H5V10h6l5-5zm3 3.21L17.21 10l1.79 1.79 1.79-1.79L21 9.21l-1.79-1.79L21 5.63l-1.79 1.79L17.21 5 16 6.21l1.79 1.79L16 9.21z');
+  } else {
+    audio.volume = 0.2;
+    document.getElementById('sound-icon').setAttribute('d', 'M14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77zm-3 2.06v13.42l-4-4H3v-6h4l4-4zm5.54 1.46L15 7.59l-1.54-1.54-1.41 1.41L13.59 9l-1.54 1.54 1.41 1.41L15 10.41l1.54 1.54 1.41-1.41L16.41 9l1.54-1.54-1.41-1.41z');
+  }
+  
+  // Attempt to play if blocked by browser
+  if (!isMuted) audio.play().catch(e => console.log("Audio play blocked"));
+});
+
+    // ===== Loader & Main Content =====
+    window.addEventListener("load", () => {
+      const loader = document.getElementById("loader");
+      const main = document.getElementById("main-content");
+      const audio = document.getElementById("ambient-audio");
+    
+      setTimeout(() => {
+        loader.classList.add("fade-out");
+        setTimeout(() => {
+          loader.style.display = "none";
+          main.style.display = "flex";
+          audio.volume = 0.2;
+          audio.play().catch(e => console.warn("Audio blocked"));
+    
+          // Typing animation
+          const h1 = document.querySelector('h1');
+          const text = 'void.lol';
+          let i = 0;
+          let isDeleting = false;
+          let cursorVisible = true;
+    
+          function blinkCursor() {
+            cursorVisible = !cursorVisible;
+            updateText();
+            setTimeout(blinkCursor, 500);
+          }
+    
+          function updateText() {
+            const displayText = text.substring(0, i) || '&nbsp;';
+            const cursorChar = cursorVisible ? '<span class="cursor">|</span>' : '';
+            h1.innerHTML = displayText + cursorChar;
+          }
+    
+          function animate() {
+            const typeSpeed = 200;
+            const deleteSpeed = 50;
+            
+            updateText();
+            
+            if (!isDeleting) {
+              i++;
+              if (i > text.length) {
+                isDeleting = true;
+                setTimeout(animate, 1000);
+              } else {
+                setTimeout(animate, typeSpeed);
+              }
+            } else {
+              i--;
+              if (i < 0) {
+                isDeleting = false;
+                setTimeout(animate, 500);
+              } else {
+                setTimeout(animate, deleteSpeed);
+              }
+            }
+          }
+    
+          // Add cursor style
+          const style = document.createElement('style');
+          style.textContent = `
+            .cursor {
+              color: #ff1f4b;
+              animation: blink 1s step-end infinite;
+            }
+            @keyframes blink {
+              from, to { opacity: 1 }
+              50% { opacity: 0 }
+            }
+          `;
+          document.head.appendChild(style);
+    
+          // Start animations
+          animate();
+          blinkCursor();
+        }, 800);
+      }, 1200);
+    });
+
+    // ===== Cursor Movement =====
+    document.addEventListener("DOMContentLoaded", () => {
+      const cursor = document.getElementById('cursor-glow');
+      let mouseX = 0, mouseY = 0;
+      let posX = 0, posY = 0;
+
+      function updateCursor() {
+        posX += (mouseX - posX) * 0.2;
+        posY += (mouseY - posY) * 0.2;
+        cursor.style.left = `${posX}px`;
+        cursor.style.top = `${posY}px`;
+        requestAnimationFrame(updateCursor);
+      }
+
+      document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        cursor.style.opacity = '0.8';
+      });
+
+      document.addEventListener('mouseleave', () => {
+        cursor.style.opacity = '0';
+      });
+
+      document.addEventListener('mouseenter', () => {
+        cursor.style.opacity = '0.8';
+      });
+
+      updateCursor();
+    });
+
+    // ===== Link Effects =====
+    // Random flicker speed
+    setInterval(() => {
+      document.querySelectorAll('.links a').forEach(link => {
+        link.style.animationDuration = `${0.5 + Math.random() * 1}s`;
+      });
+    }, 2000);
+
+    // Random link glow
+    setInterval(() => {
+      const links = document.querySelectorAll('.links a');
+      const randomLink = links[Math.floor(Math.random() * links.length)];
+      
+      randomLink.style.transition = 'all 0.8s cubic-bezier(0.2, 1, 0.8, 1)';
+      randomLink.style.boxShadow = '0 0 30px #ff1f4b';
+      randomLink.style.transform = 'scale(1.08)';
+      
+      setTimeout(() => {
+        randomLink.style.transition = 'all 1.2s ease-out';
+        randomLink.style.boxShadow = '0 0 10px #ff1f4b55';
+        randomLink.style.transform = 'scale(1)';
+      }, 1200);
+    }, 7000);
+  </script>
+</body>
+</html>

@@ -12,6 +12,95 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ff1f4b'%3E%3Cpath d='M12 2C7 2 4 6 4 10c0 3 1.5 5 3 6v3c0 .6.4 1 1 1h2v-3h2v3h2c.6 0 1-.4 1-1v-3c1.5-1 3-3 3-6 0-4-3-8-8-8zM8 12c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.5 1-1 1zm8 0c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.5 1-1 1z'/%3E%3C/svg%3E">
 
   <style>
+
+@media (max-width: 600px) {
+  .contained-portal h1 {
+    font-size: 3rem;
+    margin-bottom: 100px;
+  }
+  a {
+    padding: 10px 20px;
+    font-size: 1rem;
+  }
+}
+
+  .contained-portal {
+    /* Existing styles */
+    transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1), 
+                box-shadow 0.4s ease;
+    transform-style: preserve-3d;
+    perspective: 1000px;
+    cursor: pointer;
+  }
+
+  .contained-portal::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, transparent 40%, #ff1f4b22 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: 30px;
+    pointer-events: none;
+  }
+
+  .contained-portal:hover {
+    transform: perspective(1000px) 
+               rotateX(var(--rotate-x)) 
+               rotateY(var(--rotate-y)) 
+               scale(1.03);
+    box-shadow: 0 0 50px #ff1f4b55;
+  }
+
+  .contained-portal:hover::before {
+    opacity: 1;
+  }
+
+    
+    .contained-portal {
+    border: 2px solid #ff1f4b;
+    box-shadow: 0 0 30px #ff1f4b33, inset 0 0 20px #ff1f4b11;
+    width: 600px;
+    height: 70vh; /* Increased height */
+    max-width: 90vw;
+    margin: 5vh auto;
+    padding: 40px;
+    position: relative;
+    background: rgba(10, 10, 10, 0.9);
+    border-radius: 30px; /* Rounded corners */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Vertical center */
+    align-items: center; /* Horizontal center */
+  }
+
+  .contained-portal::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border: 1px solid #ff1f4b55;
+    border-radius: 30px; /* Match container radius */
+    pointer-events: none;
+  }
+
+  /* Adjust text positioning */
+  .contained-portal h1 {
+    margin: 0 0 150px 0; /* More space below text */
+    text-align: center;
+  }
+
+  /* Keep links centered */
+  .contained-portal .links {
+    width: 100%;
+    max-width: 400px;
+  }
+
     /* === Base Styles === */
     body, html {
       margin: 0;
@@ -190,13 +279,14 @@
   <!-- Background Audio -->
   <audio id="ambient-audio" src="creepy.mp3" loop></audio>
 
-  <!-- Main Content -->
   <main id="main-content">
-    <h1>void.lol</h1>
-    <div class="links">
-      <a href="https://www.youtube.com/@NevixToSzef" target="_blank" rel="noopener noreferrer">YouTube</a>
-      <a href="https://discordapp.com/users/1165622984204095488" target="_blank" rel="noopener noreferrer">Discord</a>
-      <a href="https://open.spotify.com/user/xh75omw7t7qtz2y28n27i8gii?si=ed651ec3725d456f" target="_blank" rel="noopener noreferrer">Spotify</a>
+    <div class="contained-portal">
+      <h1>v0id.lol</h1>
+      <div class="links">
+        <a href="https://www.youtube.com/@NevixToSzef" target="_blank">YouTube</a>
+        <a href="https://discordapp.com/users/1165622984204095488" target="_blank">Discord</a>
+        <a href="https://open.spotify.com/user/xh75omw7t7qtz2y28n27i8gii?si=ed651ec3725d456f" target="_blank">Spotify</a>
+      </div>
     </div>
     <img class="skull-bg" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Skull_icon.svg" alt="Skull">
   </main>
@@ -204,6 +294,34 @@
   <!-- Scripts -->
   <script src="cursor.js"></script>
   <script>
+
+let lastFrame = 0;
+function optimizedAnimation(timestamp) {
+  if (timestamp - lastFrame > 16) { // ~60fps
+    // Update animations
+    lastFrame = timestamp;
+  }
+  requestAnimationFrame(optimizedAnimation);
+}
+
+document.querySelector('.contained-portal').addEventListener('mousemove', (e) => {
+    const portal = e.currentTarget;
+    const rect = portal.getBoundingClientRect();
+    const centerX = (rect.left + rect.right) / 2;
+    const centerY = (rect.top + rect.bottom) / 2;
+    
+    const rotateY = (e.clientX - centerX) * -0.02; // -0.02 controls sensitivity
+    const rotateX = (e.clientY - centerY) * 0.02;
+    
+    portal.style.setProperty('--rotate-x', `${rotateX}deg`);
+    portal.style.setProperty('--rotate-y', `${rotateY}deg`);
+  });
+
+  document.querySelector('.contained-portal').addEventListener('mouseleave', (e) => {
+    const portal = e.currentTarget;
+    portal.style.setProperty('--rotate-x', '0deg');
+    portal.style.setProperty('--rotate-y', '0deg');
+  });
 
 // Audio Toggle Functionality
 const soundToggle = document.getElementById('sound-toggle');
